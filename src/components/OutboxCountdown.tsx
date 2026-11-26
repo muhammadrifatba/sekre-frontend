@@ -93,6 +93,22 @@ export const OutboxCountdown: React.FC<OutboxCountdownProps> = ({
   if (visibleItems.length === 0) return null;
 
   const hasActiveQueue = visibleItems.some((i) => i.status === "queued_outbox");
+  const hasEmail = visibleItems.some((i) => i.channel === "email");
+  const hasWhatsApp = visibleItems.some((i) => i.channel === "whatsapp");
+  const channelTitle =
+    hasEmail && hasWhatsApp ? "Pesan" : hasWhatsApp ? "WhatsApp" : "Email";
+
+  const headerTitle = hasActiveQueue
+    ? `⏳ Antrean Pengiriman ${channelTitle} (Waktu Tunda Pengaman 60 Detik)`
+    : hasWhatsApp && !hasEmail
+    ? "📲 Status Pengiriman WhatsApp"
+    : `📬 Status Pengiriman ${channelTitle}`;
+
+  const headerSubtitle = hasActiveQueue
+    ? "Anda masih dapat membatalkan pengiriman sebelum hitung mundur selesai"
+    : hasWhatsApp && !hasEmail
+    ? "Klik tombol Buka & Kirim ke WhatsApp di atas untuk mengirim pesan"
+    : "Pengiriman selesai diproses";
 
   const dismissCompleted = () => {
     setDismissedMap((prev) => {
@@ -110,14 +126,10 @@ export const OutboxCountdown: React.FC<OutboxCountdownProps> = ({
     <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-5xl rounded-2xl border border-slate-700 bg-slate-900/95 p-4 shadow-2xl backdrop-blur">
       <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-bold uppercase tracking-wider text-amber-400">
-          ⏳ Antrean Pengiriman Email (Waktu Tunda Pengaman 60 Detik)
+          {headerTitle}
         </span>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400">
-            {hasActiveQueue
-              ? "Anda masih dapat membatalkan pengiriman sebelum hitung mundur selesai"
-              : "Pengiriman selesai diproses"}
-          </span>
+          <span className="text-xs text-slate-400">{headerSubtitle}</span>
           {!hasActiveQueue && (
             <button
               type="button"
@@ -135,6 +147,7 @@ export const OutboxCountdown: React.FC<OutboxCountdownProps> = ({
           const rem = secondsLeftMap[item.action_id] ?? item.remaining_seconds ?? 0;
           const pct = Math.min(100, Math.max(0, Math.round((rem / 60) * 100)));
           const isQueued = item.status === "queued_outbox";
+          const isWA = item.channel === "whatsapp";
 
           return (
             <div
@@ -156,19 +169,25 @@ export const OutboxCountdown: React.FC<OutboxCountdownProps> = ({
                     className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${
                       item.status === "undone"
                         ? "bg-red-500/20 text-red-300"
-                        : item.status === "sent"
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-amber-500/20 text-amber-300"
+                        : isQueued
+                        ? "bg-amber-500/20 text-amber-300"
+                        : "bg-emerald-500/20 text-emerald-300"
                     }`}
                   >
-                    {item.status === "queued_outbox"
+                    {isQueued
                       ? "Menunggu Dikirim"
                       : item.status === "undone"
                       ? "Dibatalkan"
+                      : isWA
+                      ? "Siap di WhatsApp"
                       : "Terkirim"}
                   </span>
                 </div>
-                <p className="mt-1 truncate text-xs text-slate-400">Subjek: {item.subject}</p>
+                {item.subject && item.subject.trim() !== "" && (
+                  <p className="mt-1 truncate text-xs text-slate-400">
+                    Subjek: {item.subject}
+                  </p>
+                )}
 
                 {isQueued && (
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
@@ -207,7 +226,7 @@ export const OutboxCountdown: React.FC<OutboxCountdownProps> = ({
                   </span>
                 ) : (
                   <span className="text-xs font-semibold text-emerald-400">
-                    Berhasil Dikirim
+                    {isWA ? "Siap Dikirim via WA" : "Berhasil Dikirim"}
                   </span>
                 )}
               </div>

@@ -8,6 +8,7 @@ import OutboxCountdown from "../components/OutboxCountdown";
 import CustomerContextPanel from "../components/CustomerContextPanel";
 import AuditTimeline from "../components/AuditTimeline";
 import LoginGate from "../components/LoginGate";
+import OrderFollowUpPanel, { OrderFollowUpItem } from "../components/OrderFollowUpPanel";
 import { ScenarioDefinition } from "../lib/types";
 import { formatAuditTimestamp } from "../lib/formatTime";
 import {
@@ -107,10 +108,10 @@ export default function SekreGovernanceConsole() {
   const [showDemoScenarios, setShowDemoScenarios] = useState(false);
   const [activeScenario, setActiveScenario] = useState<ScenarioDefinition | null>(null);
   const [allRequests, setAllRequests] = useState<any[]>([]);
-  const [crmComplaints, setCrmComplaints] = useState<any[]>([]);
+  const [orderFollowups, setOrderFollowups] = useState<any[]>([]);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const [showAllPending, setShowAllPending] = useState<boolean>(false);
-  const [queueTab, setQueueTab] = useState<"pending" | "history" | "crm">("pending");
+  const [queueTab, setQueueTab] = useState<"pending" | "history" | "orders">("pending");
   const [outboxItems, setOutboxItems] = useState<any[]>([]);
   const [auditData, setAuditData] = useState<{ verification: any; events: any[] }>({
     verification: null,
@@ -157,10 +158,10 @@ export default function SekreGovernanceConsole() {
     if (showSpinner) setAuditLoading(true);
     try {
       const headers = getAuthHeaders();
-      const [obRes, audRes, crmRes] = await Promise.all([
+      const [obRes, audRes, ordRes] = await Promise.all([
         fetch(`${BACKEND_URL}/api/v1/outbox${reqId ? `?request_id=${reqId}` : ""}`, { headers }),
         fetch(`${BACKEND_URL}/api/v1/audit/verify${reqId ? `?request_id=${reqId}` : ""}`, { headers }),
-        fetch(`${BACKEND_URL}/api/v1/crm-complaints`, { headers }),
+        fetch(`${BACKEND_URL}/api/v1/order-followups`, { headers }),
       ]);
       if (obRes.status === 401 || audRes.status === 401) {
         handleUnauthorized();
@@ -173,9 +174,9 @@ export default function SekreGovernanceConsole() {
       if (audRes.ok) {
         setAuditData(await audRes.json());
       }
-      if (crmRes.ok) {
-        const crmData = await crmRes.json();
-        setCrmComplaints(crmData.items || []);
+      if (ordRes.ok) {
+        const ordData = await ordRes.json();
+        setOrderFollowups(ordData.items || []);
       }
     } catch {
       // Ignore network poll errors during offline preview
@@ -544,14 +545,14 @@ export default function SekreGovernanceConsole() {
               </button>
               <button
                 type="button"
-                onClick={() => setQueueTab("crm")}
+                onClick={() => setQueueTab("orders")}
                 className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                  queueTab === "crm"
-                    ? "bg-rose-500 text-white"
+                  queueTab === "orders"
+                    ? "bg-indigo-500 text-white"
                     : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                 }`}
               >
-                🗂️ Komplain CRM ({crmComplaints.length})
+                📦 Follow-Up Order ({orderFollowups.length})
               </button>
             </div>
 
@@ -587,29 +588,53 @@ export default function SekreGovernanceConsole() {
             💡 Klik salah satu kartu di bawah ini untuk langsung membuka dan menyetujui pesan tersebut pada bagian detail di bawah:
           </p>
 
-          {queueTab === "crm" ? (
-            crmComplaints.length === 0 ? (
+          {queueTab === "orders" ? (
+            orderFollowups.length === 0 ? (
               <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400">
-                Belum ada draft komplain CRM di <code>v_crm_complaint_draft_review</code>.
+                Belum ada item follow-up order pada run terbaru.
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2">
-                {crmComplaints.map((item: any) => (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {orderFollowups.map((item: any, idx: number) => (
                   <div
-                    key={item.action_id}
-                    className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-4 text-xs space-y-1.5"
+                    key={`${item.order_draft_id || idx}-${item.so_id || idx}`}
+                    className="rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-4 text-xs space-y-2.5"
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-rose-300">
-                        🗂️ {item.complaint_draft_id}
-                      </span>
-                      <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-200">
-                        {item.status}
-                      </span>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <span className="font-bold text-white text-sm">
+                          📦 {item.nama_customer || "Customer"}
+                        </span>
+                        {item.nama_pemesan && (
+                          <span className="ml-1.5 text-slate-300">
+                            · {item.nama_pemesan}
+                          </span>
+                        )}
+                      </div>
+
                     </div>
-                    <pre className="whitespace-pre-wrap rounded-lg bg-slate-950/80 p-2.5 text-[11px] text-slate-200 overflow-x-auto">
-                      {JSON.stringify(item.complaint_payload, null, 2)}
-                    </pre>
+
+                    <div className="flex flex-wrap gap-3 text-[11px] text-slate-300 font-mono">
+                      <span>SO: <strong className="text-indigo-200">{item.so_id || "-"}</strong></span>
+                      <span>PO: <strong className="text-slate-100">{item.po_reference || "-"}</strong></span>
+                      <span>Due: <strong className="text-amber-300">{item.due_date || "-"}</strong></span>
+                    </div>
+
+                    {Array.isArray(item.items) && item.items.length > 0 && (
+                      <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-2.5 space-y-1">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                          Daftar Item ({item.items.length})
+                        </div>
+                        {item.items.map((li: any, liIdx: number) => (
+                          <div key={liIdx} className="flex items-center justify-between text-[11px] text-slate-200">
+                            <span>• {li.item || "-"}</span>
+                            <span className="font-mono font-semibold text-emerald-300">
+                              {li.qty ?? "-"} {li.unit || ""}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
