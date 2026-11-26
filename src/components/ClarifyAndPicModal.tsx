@@ -30,17 +30,17 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
     const candidates = firstAmb?.candidates || [];
 
     return (
-      <div className="rounded-2xl border border-indigo-500/50 bg-indigo-950/30 p-6 shadow-xl space-y-4">
+      <div className="rounded-2xl border border-blue-200 bg-white p-6 shadow-sm space-y-4">
         <div>
-          <span className="inline-flex items-center rounded-full bg-indigo-500/20 px-3 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/40">
+          <span className="inline-flex items-center rounded-full bg-[#EEF2FF] px-3 py-0.5 text-xs font-bold text-[#2F55D4] border border-blue-200">
             🔍 Konfirmasi Pilihan Kontak &amp; Klarifikasi
           </span>
-          <h3 className="mt-1.5 text-base font-bold text-white">
+          <h3 className="mt-2 text-base font-extrabold text-slate-900">
             {candidates.length > 0
               ? "Ditemukan Lebih dari Satu Nama yang Sama"
               : "Butuh Klarifikasi Sebelum Draft Dapat Dibuat"}
           </h3>
-          <p className="mt-0.5 text-xs text-slate-300">
+          <p className="mt-0.5 text-xs text-slate-500">
             {candidates.length > 0
               ? "Silakan pilih penerima yang Anda maksud beserta jadwal pengiriman yang tersedia (di luar waktu istirahat/Sholat Jumat 11:30–13:00):"
               : "Expert menahan pembuatan draft karena beberapa detail penting belum jelas:"}
@@ -52,14 +52,16 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
             {ambiguities.map((amb: any, idx: number) => (
               <div
                 key={amb.id || idx}
-                className="rounded-xl border border-amber-500/30 bg-amber-950/25 p-3.5 text-xs space-y-1"
+                className="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs space-y-1"
               >
-                <div className="font-bold text-amber-300 uppercase text-[10px]">
+                <div className="font-bold text-amber-800 uppercase text-[10px]">
                   Field: {amb.field || "detail"}
                 </div>
-                <p className="text-slate-200">{amb.clarification_question || amb.description}</p>
+                <p className="text-slate-800 font-medium">
+                  {amb.clarification_question || amb.description}
+                </p>
                 {amb.description && amb.clarification_question && (
-                  <p className="text-slate-400 text-[11px]">{amb.description}</p>
+                  <p className="text-slate-500 text-[11px]">{amb.description}</p>
                 )}
               </div>
             ))}
@@ -80,28 +82,28 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
                 }}
                 className={`cursor-pointer rounded-xl border p-4 transition-all ${
                   isSelected
-                    ? "border-indigo-400 bg-indigo-900/40 shadow-md"
-                    : "border-slate-800 bg-slate-900/70 hover:border-slate-700"
+                    ? "border-[#2F55D4] bg-[#EEF2FF]/60 ring-2 ring-[#2F55D4]/15 shadow-sm"
+                    : "border-slate-200 bg-slate-50/70 hover:border-slate-300 hover:bg-white"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-white">{cand.name}</span>
-                  <span className="rounded-md bg-slate-800 px-2.5 py-0.5 font-mono text-xs text-amber-300">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-bold text-slate-900">{cand.name}</span>
+                  <span className="rounded-md bg-amber-50 border border-amber-200 px-2.5 py-0.5 font-mono text-xs font-semibold text-amber-800">
                     {cand.city} ({cand.tz_label})
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-slate-300">
-                  {cand.unit} · <strong>{cand.org_name}</strong>
+                <p className="mt-1 text-xs text-slate-600">
+                  {cand.unit} · <strong className="text-slate-800">{cand.org_name}</strong>
                 </p>
                 {(cand.phone || cand.email) && (
                   <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
                     {cand.phone && (
-                      <span className="rounded bg-emerald-950/60 px-2 py-0.5 font-mono text-emerald-300 border border-emerald-500/30">
+                      <span className="rounded bg-emerald-50 px-2 py-0.5 font-mono text-emerald-700 border border-emerald-200">
                         📲 {cand.phone}
                       </span>
                     )}
                     {cand.email && (
-                      <span className="rounded bg-sky-950/60 px-2 py-0.5 font-mono text-sky-300 border border-sky-500/30">
+                      <span className="rounded bg-blue-50 px-2 py-0.5 font-mono text-[#2F55D4] border border-blue-200">
                         ✉️ {cand.email}
                       </span>
                     )}
@@ -109,7 +111,7 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
                 )}
 
                 <div className="mt-3">
-                  <p className="text-[11px] font-semibold text-slate-400">
+                  <p className="text-[11px] font-semibold text-slate-500">
                     Pilih Jam Pengiriman yang Tersedia:
                   </p>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -124,8 +126,8 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
                         }}
                         className={`rounded-lg px-2.5 py-1 text-xs transition ${
                           isSelected && selectedSlot === slot
-                            ? "bg-indigo-500 text-white font-bold"
-                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                            ? "bg-[#2F55D4] text-white font-bold shadow-sm"
+                            : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
                         }`}
                       >
                         🗓️ {formatScheduleTime(slot, cand.tz_label)}
@@ -142,7 +144,7 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
           <button
             disabled={loading}
             onClick={() => onResolveClarify(selectedContactId, selectedSlot)}
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#2F55D4] px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-[#2444B3] disabled:cursor-not-allowed disabled:opacity-50 transition"
           >
             {loading ? (
               <>
@@ -161,27 +163,31 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
   if (interrupt.type === "PIC_INTAKE") {
     const unknownList = interrupt.unknown_names || [];
     return (
-      <div className="rounded-2xl border border-amber-500/50 bg-amber-950/30 p-6 shadow-xl space-y-4">
+      <div className="rounded-2xl border border-amber-200 bg-white p-6 shadow-sm space-y-4">
         <div>
-          <span className="inline-flex items-center rounded-full bg-amber-500/20 px-3 py-0.5 text-xs font-bold text-amber-300 border border-amber-500/40">
+          <span className="inline-flex items-center rounded-full bg-amber-50 px-3 py-0.5 text-xs font-bold text-amber-800 border border-amber-200">
             👤 Kontak Baru Belum Terdaftar
           </span>
-          <h3 className="mt-1.5 text-base font-bold text-white">
+          <h3 className="mt-2 text-base font-extrabold text-slate-900">
             Tambahkan Informasi Kontak dengan Satu Kalimat
           </h3>
-          <p className="mt-0.5 text-xs text-slate-300">
+          <p className="mt-0.5 text-xs text-slate-500">
             Masukkan nama, jabatan/perusahaan, kota, serta nomor WhatsApp atau alamat email penerima:
           </p>
         </div>
 
         {unknownList.map((u: any, i: number) => (
-          <div key={i} className="rounded-lg border border-slate-800 bg-slate-900/80 p-3 text-xs text-slate-200">
-            Kontak yang dicari: <strong>{u.raw_name}</strong> ({u.raw_org || "Perusahaan Pelanggan"})
+          <div
+            key={i}
+            className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700"
+          >
+            Kontak yang dicari: <strong className="text-slate-900">{u.raw_name}</strong> (
+            {u.raw_org || "Perusahaan Pelanggan"})
           </div>
         ))}
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-slate-300">
+          <label className="text-xs font-semibold text-slate-700">
             Detail Kontak (Otomatis menyesuaikan format nomor +62 &amp; zona waktu kota):
           </label>
           <input
@@ -189,14 +195,14 @@ export const ClarifyAndPicModal: React.FC<ClarifyAndPicModalProps> = ({
             value={picSentence}
             onChange={(e) => setPicSentence(e.target.value)}
             placeholder="Contoh: Pak Hendra Direktur PT BKT di Balikpapan nomor 08123456789 prefer WA"
-            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-sm text-white"
+            className="w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 focus:border-[#2F55D4] focus:ring-2 focus:ring-[#2F55D4]/15 focus:outline-none"
           />
         </div>
 
         <div className="flex justify-end pt-1">
           <button
             onClick={() => onResolvePicIntake(picSentence)}
-            className="rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-bold text-white shadow hover:bg-amber-500"
+            className="rounded-xl bg-amber-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-amber-700 transition"
           >
             Simpan Kontak &amp; Buat Draf Pesan
           </button>

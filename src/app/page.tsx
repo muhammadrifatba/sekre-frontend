@@ -63,32 +63,32 @@ function getRequestSummary(req: any) {
       : req?.source_refs?.[0] || "Menunggu klarifikasi";
 
   let statusLabel = "⏳ Menunggu Persetujuan";
-  let statusColor = "border-amber-500/40 bg-amber-500/15 text-amber-300";
+  let statusColor = "border-amber-200 bg-amber-50 text-amber-800";
 
   if (req?.status === "revalidation_failed") {
     statusLabel = "⚠️ Perubahan Terdeteksi — Approval Ulang";
-    statusColor = "border-orange-500/50 bg-orange-500/20 text-orange-300";
+    statusColor = "border-orange-200 bg-orange-50 text-orange-800";
   } else if (req?.status === "failed") {
     statusLabel = "❌ Gagal Diproses";
-    statusColor = "border-red-500/50 bg-red-500/15 text-red-300";
+    statusColor = "border-red-200 bg-red-50 text-red-700";
   } else if (req?.status === "needs_clarify" || req?.interrupt?.type === "CLARIFY") {
     statusLabel = "🔍 Perlu Klarifikasi";
-    statusColor = "border-indigo-500/40 bg-indigo-500/15 text-indigo-300";
+    statusColor = "border-blue-200 bg-blue-50 text-[#2F55D4]";
   } else if (req?.interrupt?.type === "PIC_INTAKE") {
     statusLabel = "👤 Kontak Baru Belum Terdaftar";
-    statusColor = "border-amber-500/40 bg-amber-500/15 text-amber-300";
+    statusColor = "border-amber-200 bg-amber-50 text-amber-800";
   } else if (req?.status === "handed_off") {
     statusLabel = "📲 Diserahkan ke WA";
-    statusColor = "border-emerald-500/40 bg-emerald-500/15 text-emerald-300";
+    statusColor = "border-emerald-200 bg-emerald-50 text-emerald-700";
   } else if (req?.status === "approved" || req?.status === "queued") {
     statusLabel = "⏳ Disetujui / Antre Kirim";
-    statusColor = "border-sky-500/40 bg-sky-500/15 text-sky-300";
+    statusColor = "border-sky-200 bg-sky-50 text-sky-700";
   } else if (req?.status === "executed") {
     statusLabel = "✅ Sudah Dieksekusi";
-    statusColor = "border-emerald-500/40 bg-emerald-500/15 text-emerald-300";
+    statusColor = "border-emerald-200 bg-emerald-50 text-emerald-700";
   } else if (req?.status === "rejected") {
     statusLabel = "❌ Dibatalkan";
-    statusColor = "border-red-500/40 bg-red-500/15 text-red-300";
+    statusColor = "border-red-200 bg-red-50 text-red-700";
   }
 
   return {
@@ -433,8 +433,11 @@ export default function SekreGovernanceConsole() {
 
   if (!authChecked) {
     return (
-      <main className="min-h-screen bg-slate-950 text-slate-300 flex items-center justify-center text-sm">
-        Memeriksa sesi login...
+      <main className="min-h-screen bg-[#F6F8FC] text-slate-600 flex items-center justify-center text-sm font-medium">
+        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-5 py-3.5 shadow-sm">
+          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[#2F55D4] border-t-transparent" />
+          <span>Memeriksa sesi login...</span>
+        </div>
       </main>
     );
   }
@@ -468,408 +471,425 @@ export default function SekreGovernanceConsole() {
       : [];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 pb-32 space-y-6 max-w-7xl mx-auto">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <h1 className="text-xl font-extrabold tracking-tight text-white">
-            SEKRE — Pusat Konfirmasi Pengiriman Pesan (WhatsApp &amp; Email)
-          </h1>
-          <p className="mt-0.5 text-xs text-slate-400">
-            PT Nusantara Alat Berat · Terhubung Otomatis dengan Tencent WorkBuddy
-          </p>
-        </div>
-        <div className="flex items-center gap-2.5">
-          <button
-            onClick={() => setLiveSyncEnabled(!liveSyncEnabled)}
-            className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-semibold transition ${
-              liveSyncEnabled
-                ? "border-emerald-500/40 bg-emerald-950/50 text-emerald-300"
-                : "border-slate-700 bg-slate-900 text-slate-400"
-            }`}
-          >
-            <span
-              className={`inline-block h-2 w-2 rounded-full ${
-                liveSyncEnabled ? "bg-emerald-400 animate-pulse" : "bg-slate-500"
-              }`}
-            />
-            {liveSyncEnabled
-              ? "Sinkronisasi WorkBuddy: Aktif"
-              : "Sinkronisasi WorkBuddy: Nonaktif"}
-          </button>
-          <button
-            onClick={() => syncRequestsFromBackend(true, undefined, true)}
-            disabled={refreshing || initialLoading}
-            className="rounded-xl border border-indigo-500/40 bg-indigo-950/60 px-3.5 py-2 text-xs font-semibold text-indigo-300 hover:bg-indigo-900/60 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {refreshing || initialLoading ? "⏳ Memuat..." : "🔄 Muat Ulang"}
-          </button>
-          <button
-            onClick={() => setShowDemoScenarios(!showDemoScenarios)}
-            className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800"
-          >
-            {showDemoScenarios ? "Tutup Demo" : "🧪 Demo"}
-          </button>
-          <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs">
-            <span className="font-semibold text-slate-200">{owner.name}</span>
+    <div className="min-h-screen bg-[#F6F8FC] text-slate-900">
+      {/* Mekari-style Sticky Top Navigation Bar */}
+      <header className="sticky top-0 z-30 border-b border-slate-200/90 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-6 py-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2F55D4] text-base font-extrabold text-white shadow-sm">
+              S
+            </div>
+            <div>
+              <h1 className="text-base sm:text-lg font-extrabold tracking-tight text-slate-900">
+                SEKRE — Pusat Konfirmasi Pengiriman Pesan
+              </h1>
+              <p className="text-xs text-slate-500">
+                PT Nusantara Alat Berat · WhatsApp &amp; Email · Terhubung Otomatis dengan Tencent WorkBuddy
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={async () => {
-                await logoutOwner();
-                setOwner(null);
-              }}
-              className="rounded-md bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-red-300 hover:bg-red-950/60"
+              onClick={() => setLiveSyncEnabled(!liveSyncEnabled)}
+              className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                liveSyncEnabled
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100/70"
+                  : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
+              }`}
             >
-              Keluar
+              <span
+                className={`inline-block h-2 w-2 rounded-full ${
+                  liveSyncEnabled ? "bg-emerald-500 animate-pulse" : "bg-slate-400"
+                }`}
+              />
+              {liveSyncEnabled
+                ? "Sinkronisasi WorkBuddy: Aktif"
+                : "Sinkronisasi WorkBuddy: Nonaktif"}
             </button>
+            <button
+              onClick={() => syncRequestsFromBackend(true, undefined, true)}
+              disabled={refreshing || initialLoading}
+              className="rounded-full border border-blue-200 bg-[#EEF2FF] px-3.5 py-1.5 text-xs font-semibold text-[#2F55D4] hover:bg-blue-100/80 disabled:cursor-not-allowed disabled:opacity-50 transition"
+            >
+              {refreshing || initialLoading ? "⏳ Memuat..." : "🔄 Muat Ulang"}
+            </button>
+            <button
+              onClick={() => setShowDemoScenarios(!showDemoScenarios)}
+              className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                showDemoScenarios
+                  ? "border-[#2F55D4] bg-[#2F55D4] text-white"
+                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              {showDemoScenarios ? "Tutup Demo" : "🧪 Demo"}
+            </button>
+            <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 pl-3 pr-1.5 py-1 text-xs">
+              <span className="font-semibold text-slate-700">{owner.name}</span>
+              <button
+                onClick={async () => {
+                  await logoutOwner();
+                  setOwner(null);
+                }}
+                className="rounded-full bg-white border border-slate-200 px-2.5 py-0.5 text-[11px] font-semibold text-red-600 hover:bg-red-50 hover:border-red-200 transition"
+              >
+                Keluar
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {showDemoScenarios && (
-        <ScenarioLauncher
-          activeScenarioId={activeScenario?.id}
-          loading={loading}
-          onRunScenario={handleRunScenario}
-        />
-      )}
+      <main className="mx-auto max-w-7xl px-6 py-6 pb-32 space-y-6">
+        {showDemoScenarios && (
+          <ScenarioLauncher
+            activeScenarioId={activeScenario?.id}
+            loading={loading}
+            onRunScenario={handleRunScenario}
+          />
+        )}
 
-      {errorBanner && (
-        <div className="rounded-xl border border-red-500 bg-red-950/70 p-4 text-xs font-semibold text-red-200">
-          ⚠️ Peringatan Sistem: {errorBanner}
-        </div>
-      )}
+        {errorBanner && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-700 shadow-sm">
+            ⚠️ Peringatan Sistem: {errorBanner}
+          </div>
+        )}
 
-      {/* Panel Daftar Antrean Permintaan (Klik kartu mana saja untuk langsung melihat & menyetujui di bawah) */}
-      {allRequests.length > 0 && (
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-sm font-bold text-white">
-                📥 Daftar Permintaan Pengiriman Pesan
-              </h2>
-              <button
-                type="button"
-                onClick={() => {
-                  setQueueTab("pending");
-                  if (pendingRequests[0]) {
-                    selectRequest(pendingRequests[0].request_id, false);
-                  }
-                }}
-                className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                  queueTab === "pending"
-                    ? "bg-amber-500 text-slate-950"
-                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                }`}
-              >
-                ⏳ Perlu Konfirmasi ({pendingRequests.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setQueueTab("history");
-                  if (completedRequests[0]) {
-                    selectRequest(completedRequests[0].request_id, false);
-                  }
-                }}
-                className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                  queueTab === "history"
-                    ? "bg-emerald-500 text-slate-950"
-                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                }`}
-              >
-                ✅ Selesai / Riwayat ({completedRequests.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setQueueTab("orders")}
-                className={`rounded-lg px-3 py-1 text-xs font-bold transition ${
-                  queueTab === "orders"
-                    ? "bg-indigo-500 text-white"
-                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                }`}
-              >
-                📦 Follow-Up Order ({orderFollowups.length})
-              </button>
-            </div>
-
-            {queueTab === "pending" && pendingRequests.length > 1 && (
-              <div className="flex items-center gap-2">
+        {/* Panel Daftar Antrean Permintaan (Klik kartu mana saja untuk langsung melihat & menyetujui di bawah) */}
+        {allRequests.length > 0 && (
+          <section className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-sm font-extrabold text-slate-900 mr-1">
+                  📥 Daftar Permintaan Pengiriman Pesan
+                </h2>
                 <button
                   type="button"
-                  onClick={() => setShowAllPending(false)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-                    !showAllPending
-                      ? "border-indigo-400 bg-indigo-600 text-white"
-                      : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-600"
+                  onClick={() => {
+                    setQueueTab("pending");
+                    if (pendingRequests[0]) {
+                      selectRequest(pendingRequests[0].request_id, false);
+                    }
+                  }}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition ${
+                    queueTab === "pending"
+                      ? "bg-[#2F55D4] text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200/70"
                   }`}
                 >
-                  🎯 Tampilkan yang Diklik Saja
+                  ⏳ Perlu Konfirmasi ({pendingRequests.length})
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAllPending(true)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-                    showAllPending
-                      ? "border-indigo-400 bg-indigo-600 text-white"
-                      : "border-slate-700 bg-slate-900 text-slate-300 hover:border-slate-600"
+                  onClick={() => {
+                    setQueueTab("history");
+                    if (completedRequests[0]) {
+                      selectRequest(completedRequests[0].request_id, false);
+                    }
+                  }}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition ${
+                    queueTab === "history"
+                      ? "bg-emerald-600 text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200/70"
                   }`}
                 >
-                  📋 Tampilkan Semua Sekaligus ({pendingRequests.length})
+                  ✅ Selesai / Riwayat ({completedRequests.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQueueTab("orders")}
+                  className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition ${
+                    queueTab === "orders"
+                      ? "bg-[#2F55D4] text-white shadow-sm"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200/70"
+                  }`}
+                >
+                  📦 Follow-Up Order ({orderFollowups.length})
                 </button>
               </div>
-            )}
-          </div>
 
-          <p className="text-xs text-slate-400">
-            💡 Klik salah satu kartu di bawah ini untuk langsung membuka dan menyetujui pesan tersebut pada bagian detail di bawah:
-          </p>
-
-          {queueTab === "orders" ? (
-            <OrderFollowUpPanel
-              items={orderFollowups}
-              loading={loading}
-              onSubmitOrderDecision={handleSubmitOrderDecision}
-            />
-          ) : (
-            <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
-              {currentTabList.map((req, idx) => {
-                const info = getRequestSummary(req);
-                const isSelected =
-                  !showAllPending && req.request_id === selectedSnapshot?.request_id;
-                return (
-                  <div
-                    key={req.request_id}
-                    onClick={() => selectRequest(req.request_id, true)}
-                    className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
-                      isSelected
-                        ? "border-indigo-400 bg-indigo-950/60 ring-2 ring-indigo-500/40 shadow-lg"
-                        : "border-slate-800 bg-slate-950/70 hover:border-indigo-500/40 hover:bg-slate-900"
+              {queueTab === "pending" && pendingRequests.length > 1 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllPending(false)}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                      !showAllPending
+                        ? "border-[#2F55D4] bg-[#EEF2FF] text-[#2F55D4]"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${info.statusColor}`}
-                      >
-                        #{idx + 1} · {info.statusLabel}
-                      </span>
-                      <span className="font-mono text-[10px] text-slate-400">
-                        {formatAuditTimestamp(req.updated_at_iso || req.updated_at)}
-                      </span>
-                    </div>
-                    <div className="mt-2 text-sm font-bold text-white truncate">
-                      {info.recipientName}{" "}
-                      {info.orgName ? (
-                        <span className="font-normal text-slate-300">
-                          — {info.orgName}
+                    🎯 Tampilkan yang Diklik Saja
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAllPending(true)}
+                    className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                      showAllPending
+                        ? "border-[#2F55D4] bg-[#EEF2FF] text-[#2F55D4]"
+                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    📋 Tampilkan Semua Sekaligus ({pendingRequests.length})
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-slate-500">
+              💡 Klik salah satu kartu di bawah ini untuk langsung membuka dan menyetujui pesan tersebut pada bagian detail di bawah:
+            </p>
+
+            {queueTab === "orders" ? (
+              <OrderFollowUpPanel
+                items={orderFollowups}
+                loading={loading}
+                onSubmitOrderDecision={handleSubmitOrderDecision}
+              />
+            ) : (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {currentTabList.map((req, idx) => {
+                  const info = getRequestSummary(req);
+                  const isSelected =
+                    !showAllPending && req.request_id === selectedSnapshot?.request_id;
+                  return (
+                    <div
+                      key={req.request_id}
+                      onClick={() => selectRequest(req.request_id, true)}
+                      className={`cursor-pointer rounded-xl border p-4 transition-all ${
+                        isSelected
+                          ? "border-[#2F55D4] bg-[#EEF2FF]/60 ring-2 ring-[#2F55D4]/20 shadow-sm"
+                          : "border-slate-200 bg-white hover:border-[#2F55D4]/40 hover:bg-slate-50/70"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${info.statusColor}`}
+                        >
+                          #{idx + 1} · {info.statusLabel}
                         </span>
-                      ) : null}
-                    </div>
-                    <div className="mt-1 flex items-center justify-between gap-2 text-xs">
-                      <span className="font-mono font-semibold text-indigo-300 truncate">
-                        {info.channel === "whatsapp" ? "📲 " : "✉️ "}
-                        {info.destination}
-                      </span>
-                      {isSelected && (
-                        <span className="rounded bg-indigo-500/20 px-2 py-0.5 text-[10px] font-bold text-indigo-300">
-                          Sedang Dibuka
+                        <span className="font-mono text-[10px] text-slate-400">
+                          {formatAuditTimestamp(req.updated_at_iso || req.updated_at)}
                         </span>
-                      )}
+                      </div>
+                      <div className="mt-2.5 text-sm font-bold text-slate-900 truncate">
+                        {info.recipientName}{" "}
+                        {info.orgName ? (
+                          <span className="font-normal text-slate-500">
+                            — {info.orgName}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-1.5 flex items-center justify-between gap-2 text-xs">
+                        <span className="font-mono font-semibold text-[#2F55D4] truncate">
+                          {info.channel === "whatsapp" ? "📲 " : "✉️ "}
+                          {info.destination}
+                        </span>
+                        {isSelected && (
+                          <span className="rounded-full bg-[#2F55D4] px-2.5 py-0.5 text-[10px] font-bold text-white">
+                            Sedang Dibuka
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
-      )}
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
 
-      <div ref={detailSectionRef} className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          {initialLoading && allRequests.length === 0 ? (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-10 text-center space-y-3">
-              <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
-              <h3 className="text-sm font-bold text-white">
-                Memuat Daftar Permintaan dari Server...
-              </h3>
-              <p className="mx-auto max-w-md text-xs text-slate-400">
-                Sedang mengambil data antrean persetujuan, konteks pelanggan, dan riwayat keamanan.
-              </p>
-            </div>
-          ) : displayedSnapshots.length === 0 ? (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-10 text-center space-y-2">
-              <div className="text-2xl">📲</div>
-              <h3 className="text-base font-bold text-white">
-                Menunggu Perintah dari Tencent WorkBuddy
-              </h3>
-              <p className="mx-auto max-w-md text-xs text-slate-400 leading-relaxed">
-                Kirimkan transkrip suara atau perintah pengiriman pesan di{" "}
-                <strong>Tencent WorkBuddy</strong>. Semua draf pesan beserta nomor WhatsApp /
-                alamat Email tujuan akan otomatis tampil di halaman ini untuk Anda setujui.
-              </p>
-            </div>
-          ) : null}
+        <div ref={detailSectionRef} className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            {initialLoading && allRequests.length === 0 ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm space-y-3">
+                <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-[#2F55D4] border-t-transparent" />
+                <h3 className="text-sm font-bold text-slate-900">
+                  Memuat Daftar Permintaan dari Server...
+                </h3>
+                <p className="mx-auto max-w-md text-xs text-slate-500">
+                  Sedang mengambil data antrean persetujuan, konteks pelanggan, dan riwayat keamanan.
+                </p>
+              </div>
+            ) : displayedSnapshots.length === 0 ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm space-y-2.5">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EEF2FF] text-2xl">
+                  📲
+                </div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Menunggu Perintah dari Tencent WorkBuddy
+                </h3>
+                <p className="mx-auto max-w-md text-xs text-slate-500 leading-relaxed">
+                  Kirimkan transkrip suara atau perintah pengiriman pesan di{" "}
+                  <strong className="text-slate-700">Tencent WorkBuddy</strong>. Semua draf pesan beserta nomor WhatsApp /
+                  alamat Email tujuan akan otomatis tampil di halaman ini untuk Anda setujui.
+                </p>
+              </div>
+            ) : null}
 
-          {displayedSnapshots.map((snapItem, idx) => {
-            const intr = snapItem?.interrupt;
-            const st = snapItem?.state || {};
-            const info = getRequestSummary(snapItem);
-            const displayNumber = showAllPending
-              ? idx + 1
-              : selectedIndexInTab >= 0
-              ? selectedIndexInTab + 1
-              : 1;
-            const totalInCurrentMode = showAllPending
-              ? displayedSnapshots.length
-              : currentTabList.length;
+            {displayedSnapshots.map((snapItem, idx) => {
+              const intr = snapItem?.interrupt;
+              const st = snapItem?.state || {};
+              const info = getRequestSummary(snapItem);
+              const displayNumber = showAllPending
+                ? idx + 1
+                : selectedIndexInTab >= 0
+                ? selectedIndexInTab + 1
+                : 1;
+              const totalInCurrentMode = showAllPending
+                ? displayedSnapshots.length
+                : currentTabList.length;
 
-            return (
-              <div key={snapItem.request_id || idx} className="space-y-4">
-                {totalInCurrentMode > 1 && (
-                  <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-indigo-500/40 bg-indigo-950/40 px-4 py-2.5 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-md bg-indigo-600 px-2 py-0.5 font-bold text-white">
-                        Permintaan #{displayNumber} dari {totalInCurrentMode}
-                      </span>
-                      <span className="font-bold text-white">
-                        {info.recipientName}
-                      </span>
-                      {info.orgName && (
-                        <span className="text-slate-300">— {info.orgName}</span>
-                      )}
+              return (
+                <div key={snapItem.request_id || idx} className="space-y-4">
+                  {totalInCurrentMode > 1 && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-blue-200 bg-[#EEF2FF]/70 px-4 py-2.5 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-md bg-[#2F55D4] px-2.5 py-0.5 font-bold text-white">
+                          Permintaan #{displayNumber} dari {totalInCurrentMode}
+                        </span>
+                        <span className="font-bold text-slate-900">
+                          {info.recipientName}
+                        </span>
+                        {info.orgName && (
+                          <span className="text-slate-600">— {info.orgName}</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-slate-500">
+                          Waktu Masuk: {formatAuditTimestamp(snapItem.updated_at_iso || snapItem.updated_at)}
+                        </span>
+                        {!showAllPending && currentTabList.length > 1 && (
+                          <div className="flex items-center gap-1 ml-2">
+                            <button
+                              type="button"
+                              disabled={selectedIndexInTab <= 0}
+                              onClick={() => {
+                                const prev = currentTabList[selectedIndexInTab - 1];
+                                if (prev) selectRequest(prev.request_id, false);
+                              }}
+                              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition"
+                            >
+                              ⬅️ Sebelumnya
+                            </button>
+                            <button
+                              type="button"
+                              disabled={
+                                selectedIndexInTab < 0 ||
+                                selectedIndexInTab >= currentTabList.length - 1
+                              }
+                              onClick={() => {
+                                const next = currentTabList[selectedIndexInTab + 1];
+                                if (next) selectRequest(next.request_id, false);
+                              }}
+                              className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition"
+                            >
+                              Selanjutnya ➡️
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  )}
 
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-slate-400">
-                        Waktu Masuk: {formatAuditTimestamp(snapItem.updated_at_iso || snapItem.updated_at)}
-                      </span>
-                      {!showAllPending && currentTabList.length > 1 && (
-                        <div className="flex items-center gap-1 ml-2">
-                          <button
-                            type="button"
-                            disabled={selectedIndexInTab <= 0}
-                            onClick={() => {
-                              const prev = currentTabList[selectedIndexInTab - 1];
-                              if (prev) selectRequest(prev.request_id, false);
-                            }}
-                            className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] font-semibold text-slate-200 hover:bg-slate-800 disabled:opacity-40"
-                          >
-                            ⬅️ Sebelumnya
-                          </button>
-                          <button
-                            type="button"
-                            disabled={
-                              selectedIndexInTab < 0 ||
-                              selectedIndexInTab >= currentTabList.length - 1
-                            }
-                            onClick={() => {
-                              const next = currentTabList[selectedIndexInTab + 1];
-                              if (next) selectRequest(next.request_id, false);
-                            }}
-                            className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] font-semibold text-slate-200 hover:bg-slate-800 disabled:opacity-40"
-                          >
-                            Selanjutnya ➡️
-                          </button>
+                  {intr && (intr.type === "CLARIFY" || intr.type === "PIC_INTAKE") && (
+                    <ClarifyAndPicModal
+                      interrupt={intr}
+                      loading={loading}
+                      onResolveClarify={(cid, slot) =>
+                        handleResolveClarify(snapItem.request_id, cid, slot)
+                      }
+                      onResolvePicIntake={(sentence) =>
+                        handleResolvePicIntake(snapItem.request_id, sentence)
+                      }
+                    />
+                  )}
+
+                  {(intr?.type === "APPROVAL" || intr?.type === "APPROVAL_GATE" || st?.plan) && (
+                    <ApprovalInbox
+                      requestId={snapItem?.request_id}
+                      plan={intr?.plan || st?.plan}
+                      findings={intr?.findings || st?.findings || []}
+                      injectionFlags={
+                        intr?.injection_flags || st?.injection_flags || []
+                      }
+                      approvalHash={
+                        intr?.approval_hash || snapItem?.payload_hash || st?.approval_hash || ""
+                      }
+                      loading={loading}
+                      onApprove={(action, decision, confirmText, editedBody, editedSubject) =>
+                        handleApproveOrEdit(
+                          snapItem,
+                          action,
+                          decision,
+                          confirmText,
+                          editedBody,
+                          editedSubject
+                        )
+                      }
+                    />
+                  )}
+
+                  {((st?.todo_items && st.todo_items.length > 0) ||
+                    (st?.commitments && st.commitments.length > 0)) && (
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm text-xs space-y-3">
+                      <h3 className="text-sm font-bold text-slate-900">
+                        📝 Todo &amp; Komitmen Terdeteksi dari Sumber
+                      </h3>
+                      {st?.todo_items?.length > 0 && (
+                        <div className="space-y-1">
+                          <div className="font-semibold text-[#2F55D4]">Todo Items:</div>
+                          {st.todo_items.map((t: any, i: number) => (
+                            <div key={t.id || i} className="text-slate-700">
+                              • {t.title || t.what || JSON.stringify(t)}{" "}
+                              {t.status && (
+                                <span className="text-slate-400">({t.status})</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {st?.commitments?.length > 0 && (
+                        <div className="space-y-1">
+                          <div className="font-semibold text-amber-700">Komitmen:</div>
+                          {st.commitments.map((c: any, i: number) => (
+                            <div key={c.id || i} className="text-slate-700">
+                              • {c.task || c.description || JSON.stringify(c)}
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {intr && (intr.type === "CLARIFY" || intr.type === "PIC_INTAKE") && (
-                  <ClarifyAndPicModal
-                    interrupt={intr}
-                    loading={loading}
-                    onResolveClarify={(cid, slot) =>
-                      handleResolveClarify(snapItem.request_id, cid, slot)
-                    }
-                    onResolvePicIntake={(sentence) =>
-                      handleResolvePicIntake(snapItem.request_id, sentence)
-                    }
-                  />
-                )}
+                  {(st?.customer_context || st?.context) && (
+                    <CustomerContextPanel contextMap={st.customer_context || st.context} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-                {(intr?.type === "APPROVAL" || intr?.type === "APPROVAL_GATE" || st?.plan) && (
-                  <ApprovalInbox
-                    requestId={snapItem?.request_id}
-                    plan={intr?.plan || st?.plan}
-                    findings={intr?.findings || st?.findings || []}
-                    injectionFlags={
-                      intr?.injection_flags || st?.injection_flags || []
-                    }
-                    approvalHash={
-                      intr?.approval_hash || snapItem?.payload_hash || st?.approval_hash || ""
-                    }
-                    loading={loading}
-                    onApprove={(action, decision, confirmText, editedBody, editedSubject) =>
-                      handleApproveOrEdit(
-                        snapItem,
-                        action,
-                        decision,
-                        confirmText,
-                        editedBody,
-                        editedSubject
-                      )
-                    }
-                  />
-                )}
-
-                {((st?.todo_items && st.todo_items.length > 0) ||
-                  (st?.commitments && st.commitments.length > 0)) && (
-                  <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 text-xs space-y-3">
-                    <h3 className="text-sm font-bold text-white">
-                      📝 Todo &amp; Komitmen Terdeteksi dari Sumber
-                    </h3>
-                    {st?.todo_items?.length > 0 && (
-                      <div className="space-y-1">
-                        <div className="font-semibold text-indigo-300">Todo Items:</div>
-                        {st.todo_items.map((t: any, i: number) => (
-                          <div key={t.id || i} className="text-slate-200">
-                            • {t.title || t.what || JSON.stringify(t)}{" "}
-                            {t.status && (
-                              <span className="text-slate-400">({t.status})</span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {st?.commitments?.length > 0 && (
-                      <div className="space-y-1">
-                        <div className="font-semibold text-amber-300">Komitmen:</div>
-                        {st.commitments.map((c: any, i: number) => (
-                          <div key={c.id || i} className="text-slate-200">
-                            • {c.task || c.description || JSON.stringify(c)}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {(st?.customer_context || st?.context) && (
-                  <CustomerContextPanel contextMap={st.customer_context || st.context} />
-                )}
-              </div>
-            );
-          })}
+          <div className="space-y-6">
+            {/* <AuditTimeline
+              events={auditData.events}
+              verification={auditData.verification}
+              loading={auditLoading || initialLoading}
+              onVerifyChain={() =>
+                refreshAuditAndOutbox(selectedSnapshot?.request_id, true)
+              }
+            /> */}
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {/* <AuditTimeline
-            events={auditData.events}
-            verification={auditData.verification}
-            loading={auditLoading || initialLoading}
-            onVerifyChain={() =>
-              refreshAuditAndOutbox(selectedSnapshot?.request_id, true)
-            }
-          /> */}
-        </div>
-      </div>
-
-      <OutboxCountdown
-        items={outboxItems}
-        undoingActionId={undoingActionId}
-        onUndo={handleUndoOutbox}
-        onRefresh={() => refreshAuditAndOutbox(selectedSnapshot?.request_id)}
-      />
-    </main>
+        <OutboxCountdown
+          items={outboxItems}
+          undoingActionId={undoingActionId}
+          onUndo={handleUndoOutbox}
+          onRefresh={() => refreshAuditAndOutbox(selectedSnapshot?.request_id)}
+        />
+      </main>
+    </div>
   );
 }

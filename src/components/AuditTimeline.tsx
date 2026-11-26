@@ -56,13 +56,13 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
   onVerifyChain,
 }) => {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div>
-          <h3 className="text-sm font-bold text-white">
+          <h3 className="text-sm font-extrabold text-slate-900">
             🛡️ Riwayat Aktivitas &amp; Keamanan
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Catatan otomatis setiap proses dari penerimaan hingga pengiriman
           </p>
         </div>
@@ -70,23 +70,23 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
         <button
           disabled={loading}
           onClick={onVerifyChain}
-          className="rounded-lg border border-emerald-500/40 bg-emerald-950/50 px-3 py-1.5 text-xs font-semibold text-emerald-300 hover:bg-emerald-900/50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50 transition"
         >
           {loading ? "⏳ Memeriksa..." : "Segarkan Status"}
         </button>
       </div>
 
       {loading && !verification ? (
-        <div className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-950/60 p-3 text-xs text-slate-400">
-          <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+        <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-500">
+          <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-[#2F55D4] border-t-transparent" />
           <span>Memverifikasi integritas rantai audit...</span>
         </div>
       ) : verification ? (
         <div
           className={`rounded-xl border p-3 text-xs ${
             verification.valid
-              ? "border-emerald-500/30 bg-emerald-950/25 text-emerald-200"
-              : "border-red-500/40 bg-red-950/40 text-red-200"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border-red-200 bg-red-50 text-red-800"
           }`}
         >
           <strong>
@@ -101,24 +101,24 @@ export const AuditTimeline: React.FC<AuditTimelineProps> = ({
 
       <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
         {loading && events.length === 0 ? (
-          <p className="py-4 text-center text-xs text-slate-400">
+          <p className="py-4 text-center text-xs text-slate-500">
             ⏳ Memuat riwayat aktivitas...
           </p>
         ) : events.length === 0 ? (
-          <p className="py-4 text-center text-xs text-slate-500">
+          <p className="py-4 text-center text-xs text-slate-400">
             Belum ada aktivitas. Kirim pesan dari WorkBuddy atau pilih contoh skenario di atas.
           </p>
         ) : (
           events.map((ev: any, idx: number) => (
             <div
               key={ev.id || ev.event_id || idx}
-              className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-xs"
+              className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-xs"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-semibold text-slate-100">
+                <span className="font-semibold text-slate-800">
                   {EVENT_LABELS[ev.event_type] || ev.event_type}
                 </span>
-                <span className="rounded bg-slate-900 px-2 py-0.5 font-mono text-[11px] text-slate-400 border border-slate-800">
+                <span className="rounded-md bg-white px-2 py-0.5 font-mono text-[11px] text-slate-500 border border-slate-200">
                   {formatAuditTimestamp(ev.timestamp)}
                 </span>
               </div>
