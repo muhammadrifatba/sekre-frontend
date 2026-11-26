@@ -396,6 +396,41 @@ export default function SekreGovernanceConsole() {
     }
   };
 
+  const handleSubmitOrderDecision = async (
+    payload: OrderFollowUpItem & { decision: "approve" | "reject" }
+  ) => {
+    setErrorBanner(null);
+    const resp = await fetch(`${BACKEND_URL}/api/v1/order-followups/approve`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        order_draft_id: payload.order_draft_id,
+        decision: payload.decision,
+        request_id: payload.request_id || "",
+        run_id: payload.run_id || "",
+        so_id: payload.so_id || "",
+        nama_pemesan: payload.nama_pemesan || "",
+        nama_customer: payload.nama_customer || "",
+        po_reference: payload.po_reference || "",
+        due_date: payload.due_date || "",
+        so_status: payload.so_status || "processing",
+        billing_status: payload.billing_status || "pending_invoice",
+        items: payload.items || [],
+        notes: payload.notes || "",
+      }),
+    });
+    if (resp.status === 401) {
+      handleUnauthorized();
+      return;
+    }
+    const data = await resp.json();
+    if (!resp.ok) {
+      setErrorBanner(data.detail || "Gagal memproses persetujuan orderan");
+      return;
+    }
+    await refreshAuditAndOutbox(selectedRequestIdRef.current || undefined);
+  };
+
   if (!authChecked) {
     return (
       <main className="min-h-screen bg-slate-950 text-slate-300 flex items-center justify-center text-sm">
@@ -589,56 +624,11 @@ export default function SekreGovernanceConsole() {
           </p>
 
           {queueTab === "orders" ? (
-            orderFollowups.length === 0 ? (
-              <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400">
-                Belum ada item follow-up order pada run terbaru.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                {orderFollowups.map((item: any, idx: number) => (
-                  <div
-                    key={`${item.order_draft_id || idx}-${item.so_id || idx}`}
-                    className="rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-4 text-xs space-y-2.5"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <span className="font-bold text-white text-sm">
-                          📦 {item.nama_customer || "Customer"}
-                        </span>
-                        {item.nama_pemesan && (
-                          <span className="ml-1.5 text-slate-300">
-                            · {item.nama_pemesan}
-                          </span>
-                        )}
-                      </div>
-
-                    </div>
-
-                    <div className="flex flex-wrap gap-3 text-[11px] text-slate-300 font-mono">
-                      <span>SO: <strong className="text-indigo-200">{item.so_id || "-"}</strong></span>
-                      <span>PO: <strong className="text-slate-100">{item.po_reference || "-"}</strong></span>
-                      <span>Due: <strong className="text-amber-300">{item.due_date || "-"}</strong></span>
-                    </div>
-
-                    {Array.isArray(item.items) && item.items.length > 0 && (
-                      <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-2.5 space-y-1">
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Daftar Item ({item.items.length})
-                        </div>
-                        {item.items.map((li: any, liIdx: number) => (
-                          <div key={liIdx} className="flex items-center justify-between text-[11px] text-slate-200">
-                            <span>• {li.item || "-"}</span>
-                            <span className="font-mono font-semibold text-emerald-300">
-                              {li.qty ?? "-"} {li.unit || ""}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )
+            <OrderFollowUpPanel
+              items={orderFollowups}
+              loading={loading}
+              onSubmitOrderDecision={handleSubmitOrderDecision}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-3">
               {currentTabList.map((req, idx) => {
